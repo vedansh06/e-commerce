@@ -2,7 +2,7 @@ import imagekit from "@/configs/imageKit";
 import prisma from "@/lib/prisma";
 import authSeller from "@/middlewares/authSeller";
 import { getAuth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 // Add a new product
 export async function POST(request) {
