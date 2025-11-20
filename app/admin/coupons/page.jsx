@@ -39,10 +39,10 @@ export default function AdminCoupons() {
     try {
       const token = await getToken();
 
-      newCoupan.discount = Number(newCoupon.discount);
+      newCoupon.discount = Number(newCoupon.discount);
       newCoupon.expiresAt = new Date(newCoupon.expiresAt);
 
-      const { data } = await axios.get(
+      const { data } = await axios.post(
         "/api/admin/coupan",
         { coupan: newCoupon },
         {
@@ -67,7 +67,7 @@ export default function AdminCoupons() {
       );
       if (!confirm) return;
       const token = await getToken();
-      await axios.delete("/api/admin/coupan?code=${code}", {
+      await axios.delete(`/api/admin/coupan?code=${code}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       await fetchCoupons();
