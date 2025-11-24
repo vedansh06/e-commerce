@@ -1,3 +1,4 @@
+import { inngest } from "@/inngest/client";
 import prisma from "@/lib/prisma";
 import authAdmin from "@/middlewares/authAdmin";
 import { getAuth } from "@clerk/nextjs/server";
@@ -6,7 +7,7 @@ import { NextResponse } from "next/server";
 // Add new coupan
 export async function POST(request) {
   try {
-    const { userId } = getAuth();
+    const { userId } = getAuth(request);
     const isAdmin = await authAdmin(userId);
 
     if (!isAdmin) {
@@ -16,7 +17,16 @@ export async function POST(request) {
     const { coupan } = await request.json();
     coupan.code = coupan.code.toUpperCase();
 
-    await prisma.coupan.create({ data: coupan });
+    await prisma.coupan.create({ data: coupan }).then(async (coupan) => {
+      // Run Inngest Schedular Function to delete coupan on expire
+      await inngest.send({
+        name: "app/coupan.expired",
+        data: {
+          code: coupan.code,
+          expires_at: coupan.expiresAt,
+        },
+      });
+    });
     return NextResponse.json({ message: "Coupan added successfully" });
   } catch (error) {
     console.error(error);
