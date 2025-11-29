@@ -1,11 +1,11 @@
 import prisma from "@/lib/prisma";
-import { useAuth } from "@clerk/nextjs/server";
+import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 // Verify Coupan
 export async function POST(request) {
   try {
-    const { userId, has } = useAuth(request);
+    const { userId, has } = getAuth(request);
     const { code } = await request.json();
 
     const coupan = await prisma.coupan.findUnique({
