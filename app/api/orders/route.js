@@ -2,14 +2,15 @@ import prisma from "@/lib/prisma";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { PaymentMethod } from "@prisma/client";
+import Stripe from "stripe";
 
 export async function POST(request) {
   try {
     const { userId, has } = getAuth(request);
     if (!userId) {
-      return NextResponse.json({ error: "noot authorized" }, { status: 401 });
+      return NextResponse.json({ error: "not authorized" }, { status: 401 });
     }
-    const { addressId, items, coupanCode, paymentMethod } =
+    const { addressId, items, couponCode, paymentMethod } =
       await request.json();
 
     // Check if all required fields are present
@@ -26,35 +27,35 @@ export async function POST(request) {
         { status: 401 }
       );
     }
-    let coupan = null;
-    if (coupanCode) {
-      const coupan = await prisma.coupan.findUnique({
+    let coupon = null;
+    if (couponCode) {
+      const coupon = await prisma.coupon.findUnique({
         where: { code: code.toUpperCase() },
       });
-      if (!coupan) {
+      if (!coupon) {
         return NextResponse.json(
-          { error: "Coupan not found" },
+          { error: "coupon not found" },
           { status: 400 }
         );
       }
     }
 
-    // Check if coupan is appplicable for new users
-    if (coupanCode && coupan.forNewUser) {
-      const useorders = await prisma.order.findMany({ where: { userId } });
-      if (useorders.length > 0) {
+    // Check if coupon is applicable for new users
+    if (couponCode && coupon.forNewUser) {
+      const userorders = await prisma.order.findMany({ where: { userId } });
+      if (userorders.length > 0) {
         return NextResponse.json(
-          { error: "Coupan valid for new user" },
+          { error: "Coupon valid for new users" },
           { status: 400 }
         );
       }
     }
     const isPlusMember = has({ plan: "plus" });
-    // Check if coupan is applicable for members
-    if (coupanCode && coupan.forMember) {
+    // Check if coupon is applicable for members
+    if (couponCode && coupon.forMember) {
       if (!isPlusMember) {
         return NextResponse.json(
-          { error: "Coupan valid for members" },
+          { error: "coupon valid for members" },
           { status: 400 }
         );
       }
@@ -84,8 +85,8 @@ export async function POST(request) {
         0
       );
 
-      if (coupanCode) {
-        total -= (total * coupan.discount) / 100;
+      if (couponCode) {
+        total -= (total * coupon.discount) / 100;
       }
       if (!isPlusMember && !isShippingFeeAdded) {
         total += 5;
@@ -99,8 +100,8 @@ export async function POST(request) {
           addressId,
           total: parseFloat(total.toFixed(2)),
           paymentMethod,
-          isCouponUsed: coupan ? true : false,
-          coupan: coupan ? coupan : {},
+          isCouponUsed: coupon ? true : false,
+          coupon: coupon ? coupon : {},
           orderItems: {
             create: sellerItems.map((item) => ({
               productId: item.id,
@@ -111,6 +112,38 @@ export async function POST(request) {
         },
       });
       orderIds.push(order.id);
+    }
+
+    if (paymentMethod === "STRIPE") {
+      const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+      const origin = await request.headers.get("origin");
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: "Order",
+              },
+              unit_amount: Math.round(fullAmount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+        // current time + 30 minutes
+        mode: "payment",
+        success_url: `${origin}/loading?nextUrl=orders`,
+        cancel_url: `${origin}/cart`,
+        metadata: {
+          orderIds: orderIds.join(","),
+          userId,
+          appId: "gocart",
+        },
+      });
+      return NextResponse.json({ session });
     }
 
     // clear the cart

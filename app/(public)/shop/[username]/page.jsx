@@ -5,17 +5,24 @@ import { useEffect, useState } from "react";
 import { MailIcon, MapPinIcon } from "lucide-react";
 import Loading from "@/components/Loading";
 import Image from "next/image";
-
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function StoreShop() {
-    
   const { username } = useParams();
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchStoreData = async () => {
-    
+    try {
+      const { data } = await axios.get(`/api/store/data?username=${username}`);
+      setStoreInfo(data.store);
+      setProducts(data.store.Product);
+    } catch (error) {
+      toast.error(error?.response?.data?.error || error.message);
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
