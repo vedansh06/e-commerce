@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { PaymentMethod } from "@prisma/client";
 
 export async function POST(request) {
   try {
@@ -137,8 +138,8 @@ export async function GET(request) {
       where: {
         userId,
         OR: [
-          { paymentMethod: paymentMethod.COD },
-          { AND: [{ paymentMethod: paymentMethod.STRIPE }, { isPaid: true }] },
+          { paymentMethod: PaymentMethod.COD },
+          { AND: [{ paymentMethod: PaymentMethod.STRIPE }, { isPaid: true }] },
         ],
       },
       include: {
