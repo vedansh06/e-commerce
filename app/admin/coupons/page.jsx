@@ -28,7 +28,7 @@ export default function AdminCoupons() {
       const { data } = await axios.get("/api/admin/coupan", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCoupons(data.coupans);
+      setCoupons(data.coupons);
     } catch (error) {
       toast.error(error?.response?.data?.error || error.message);
     }
@@ -44,7 +44,7 @@ export default function AdminCoupons() {
 
       const { data } = await axios.post(
         "/api/admin/coupan",
-        { coupan: newCoupon },
+        { coupon: newCoupon },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -63,7 +63,7 @@ export default function AdminCoupons() {
   const deleteCoupon = async (code) => {
     try {
       const confirm = window.confirm(
-        "Are you sure you want to delete this coupan?"
+        "Are you sure you want to delete this coupon?"
       );
       if (!confirm) return;
       const token = await getToken();
@@ -71,7 +71,7 @@ export default function AdminCoupons() {
         headers: { Authorization: `Bearer ${token}` },
       });
       await fetchCoupons();
-      toast.success("Coupan deleted successfully");
+      toast.success("Coupon deleted successfully");
     } catch (error) {
       toast.error(error?.response?.data?.error || error.message);
     }

@@ -52,7 +52,7 @@ const OrderSummary = ({ totalPrice, items }) => {
         return toast("Please login to place an order");
       }
       if (!selectedAddress) {
-        return toast("Please select an order");
+        return toast("Please select an address");
       }
       const token = await getToken();
       const orderData = {
@@ -60,8 +60,8 @@ const OrderSummary = ({ totalPrice, items }) => {
         items,
         paymentMethod,
       };
-      if (coupan) {
-        orderData.coupanCode = coupan.code;
+      if (coupon) {
+        orderData.couponCode = coupon.code;
       }
       // create order
       const { data } = await axios.post("/api/orders", orderData, {

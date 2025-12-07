@@ -57,7 +57,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchDashboardData();
-  }, [ ]);
+  }, []);
 
   if (loading) return <Loading />;
 

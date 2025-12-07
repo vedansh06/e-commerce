@@ -16,13 +16,13 @@ export async function POST(request) {
 
     // Get the data from the form
 
-    const fromData = await request.fromData();
-    const name = FormData.get("name");
-    const description = FormData.get("description");
-    const mrp = Number(FormData.get("mrp"));
-    const price = Number(FormData.get("price"));
-    const category = FormData.get("category");
-    const images = FormData.getAll("images");
+    const formData = await request.formData();
+    const name = formData.get("name");
+    const description = formData.get("description");
+    const mrp = Number(formData.get("mrp"));
+    const price = Number(formData.get("price"));
+    const category = formData.get("category");
+    const images = formData.getAll("images");
 
     if (
       !name ||
@@ -30,7 +30,7 @@ export async function POST(request) {
       !mrp ||
       !price ||
       !category ||
-      !images.length < 1
+      images.length < 1
     ) {
       return NextResponse.json(
         { error: "missing product details" },

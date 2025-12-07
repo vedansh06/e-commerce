@@ -3,7 +3,7 @@ import authSeller from "@/middlewares/authSeller";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Get dashboard Dtaa for Seller (total orders, total earnings, total products)
+// Get dashboard Data for Seller (total orders, total earnings, total products)
 
 export async function GET(request) {
   try {

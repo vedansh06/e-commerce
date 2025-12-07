@@ -24,7 +24,7 @@ export async function POST(request) {
 
     const store = await prisma.store.findUnique({ where: { id: storeId } });
 
-    if (!storeId) {
+    if (!store) {
       return NextResponse.json({ error: "store not found" }, { status: 400 });
     }
 

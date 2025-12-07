@@ -12,13 +12,13 @@ export async function POST(request) {
       where: { code: code.toUpperCase(), expiresAt: { gt: new Date() } },
     });
     if (!coupan) {
-      return NextResponse.json({ error: "Coupan not found" }, { status: 404 });
+      return NextResponse.json({ error: "Coupon not found" }, { status: 404 });
     }
     if (coupan.forNewUser) {
-      const useorders = await prisma.order.findMany({ where: { userId } });
-      if (useorders.length > 0) {
+      const userorders = await prisma.order.findMany({ where: { userId } });
+      if (userorders.length > 0) {
         return NextResponse.json(
-          { error: "Coupan valid for new user" },
+          { error: "Coupon valid for new users only" },
           { status: 400 }
         );
       }

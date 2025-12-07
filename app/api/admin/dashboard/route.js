@@ -32,7 +32,7 @@ export async function GET(request) {
 
     const revenue = totalRevenue.toFixed(2);
     // total products on app
-    const products = await prisma.product.count(2);
+    const products = await prisma.product.count();
     const dashboardData = {
       orders,
       stores,

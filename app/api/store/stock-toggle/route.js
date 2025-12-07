@@ -11,7 +11,7 @@ export async function POST(request) {
 
     if (!productId) {
       return NextResponse.json(
-        { error: "missing details: producyId" },
+        { error: "missing details: productId" },
         {
           status: 400,
         }

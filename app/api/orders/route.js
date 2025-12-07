@@ -29,12 +29,12 @@ export async function POST(request) {
     }
     let coupon = null;
     if (couponCode) {
-      const coupon = await prisma.coupon.findUnique({
-        where: { code: code.toUpperCase() },
+      coupon = await prisma.coupon.findUnique({
+        where: { code: couponCode },
       });
       if (!coupon) {
         return NextResponse.json(
-          { error: "coupon not found" },
+          { error: "Coupon not found" },
           { status: 400 }
         );
       }
@@ -55,7 +55,7 @@ export async function POST(request) {
     if (couponCode && coupon.forMember) {
       if (!isPlusMember) {
         return NextResponse.json(
-          { error: "coupon valid for members" },
+          { error: "Coupon valid for members only" },
           { status: 400 }
         );
       }

@@ -25,7 +25,7 @@ export async function POST(request) {
 export async function GET(request) {
   try {
     const { userId } = getAuth(request);
-    const suer = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: userId },
     });
 

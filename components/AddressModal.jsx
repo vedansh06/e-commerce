@@ -37,7 +37,7 @@ const AddressModal = ({ setShowAddressModal }) => {
       const { data } = await axios.post(
         "/api/address",
         { address },
-        { headers: { Authorization: `Bearer${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       dispatch(addAddress(data.newAddress));
       toast.success(data.message);

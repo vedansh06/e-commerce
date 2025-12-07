@@ -4,7 +4,7 @@ import authAdmin from "@/middlewares/authAdmin";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Add new coupan
+// Add new coupon
 export async function POST(request) {
   try {
     const { userId } = getAuth(request);
@@ -14,20 +14,20 @@ export async function POST(request) {
       return NextResponse.json({ error: "not authorized" }, { status: 401 });
     }
 
-    const { coupan } = await request.json();
-    coupan.code = coupan.code.toUpperCase();
+    const { coupon } = await request.json();
+    coupon.code = coupon.code.toUpperCase();
 
-    await prisma.coupan.create({ data: coupan }).then(async (coupan) => {
-      // Run Inngest Schedular Function to delete coupan on expire
+    await prisma.coupon.create({ data: coupon }).then(async (coupon) => {
+      // Run Inngest Schedular Function to delete coupon on expire
       await inngest.send({
-        name: "app/coupan.expired",
+        name: "app/coupon.expired",
         data: {
-          code: coupan.code,
-          expires_at: coupan.expiresAt,
+          code: coupon.code,
+          expires_at: coupon.expiresAt,
         },
       });
     });
-    return NextResponse.json({ message: "Coupan added successfully" });
+    return NextResponse.json({ message: "Coupon added successfully" });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -37,7 +37,7 @@ export async function POST(request) {
   }
 }
 
-// Delete Coupan /api/coupan?id=coupanId
+// Delete coupon /api/coupon?id=couponId
 
 export async function DELETE(request) {
   try {
@@ -51,8 +51,8 @@ export async function DELETE(request) {
     const { searchParams } = request.nextUrl;
     const code = searchParams.get("code");
 
-    await prisma.coupan.delete({ where: { code } });
-    return NextResponse.json({ message: "Coupan deleted successfully" });
+    await prisma.coupon.delete({ where: { code } });
+    return NextResponse.json({ message: "Coupon deleted successfully" });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -62,7 +62,7 @@ export async function DELETE(request) {
   }
 }
 
-// Get all coupans
+// Get all coupons
 export async function GET(request) {
   try {
     const { userId } = getAuth(request);
@@ -72,8 +72,8 @@ export async function GET(request) {
       return NextResponse.json({ error: "not authorized" }, { status: 401 });
     }
 
-    const coupans = await prisma.coupans.findMany({});
-    return NextResponse.json({ coupans });
+    const coupons = await prisma.coupon.findMany({});
+    return NextResponse.json({ coupons });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
