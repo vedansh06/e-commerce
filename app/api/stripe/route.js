@@ -20,7 +20,7 @@ export async function POST(request) {
         payment_intent: paymentIntentId,
       });
 
-      const { orderIds, userIds, appId } = session.data[0].metadata;
+      const { orderIds, userId, appId } = session.data[0].metadata;
 
       if (appId !== "gocart") {
         return NextResponse.json({ received: true, message: "Invalid app id" });

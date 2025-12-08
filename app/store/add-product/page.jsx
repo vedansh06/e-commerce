@@ -45,13 +45,14 @@ export default function StoreAddProduct() {
       reader.readAsDataURL(file);
       reader.onloadend = async () => {
         const base64String = reader.result.split(",")[1];
-        const mimeType = await getToken();
+        const mimetype = file.type;
+        const token = await getToken();
 
         try {
           await toast.promise(
             axios.post(
               "/api/store/ai",
-              { base64Image: base64String, mimeType },
+              { base64Image: base64String, mimetype },
               { headers: { Authorization: `Bearer ${token}` } }
             ),
             {
@@ -72,7 +73,9 @@ export default function StoreAddProduct() {
               error: (err) => err?.response?.data?.error || err.message,
             }
           );
-        } catch (error) {}
+        } catch (error) {
+          console.error(error);
+        }
       };
     }
   };
