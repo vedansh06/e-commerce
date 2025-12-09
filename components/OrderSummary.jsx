@@ -34,12 +34,12 @@ const OrderSummary = ({ totalPrice, items }) => {
 
       const token = await getToken();
       const { data } = await axios.post(
-        "/api/coupan",
-        { code: coupanCodeInput },
+        "/api/coupon",
+        { code: couponCodeInput },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setCoupan(data.coupan);
-      toast.success("Coupan Applied");
+      setCoupon(data.coupon);
+      toast.success("Coupon Applied");
     } catch (error) {
       toast.error(error?.response?.data?.error || error.message);
     }
@@ -212,15 +212,21 @@ const OrderSummary = ({ totalPrice, items }) => {
 
         <p className="font-medium text-right">
           <Protect
-            plan={"plus"}
-            fallback={`${currency}$
-            {coupon
-              ? (totalPrice + 5 - (coupon.discount / 100) * totalPrice).toFixed(2)
-              : (totalPrice + 5).toLocaleString()}`}>
+            plan="plus"
+            fallback={
+              currency +
+              (coupon
+                ? (
+                    totalPrice +
+                    5 -
+                    (coupon.discount / 100) * totalPrice
+                  ).toFixed(2)
+                : (totalPrice + 5).toFixed(2))
+            }>
             {currency}
             {coupon
               ? (totalPrice - (coupon.discount / 100) * totalPrice).toFixed(2)
-              : totalPrice.toLocaleString()}
+              : totalPrice.toFixed(2)}
           </Protect>
         </p>
       </div>

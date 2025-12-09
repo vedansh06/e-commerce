@@ -12,9 +12,7 @@ export async function POST(request) {
     if (!productId) {
       return NextResponse.json(
         { error: "missing details: productId" },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
@@ -26,7 +24,7 @@ export async function POST(request) {
 
     // check if product exists
     const product = await prisma.product.findFirst({
-      where: { productId, storeId },
+      where: { id: productId, storeId },
     });
 
     if (!product) {
@@ -38,7 +36,9 @@ export async function POST(request) {
       data: { inStock: !product.inStock },
     });
 
-    return NextResponse.json({ message: "Product stock updated successfully" });
+    return NextResponse.json({
+      message: "Product stock updated successfully",
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
